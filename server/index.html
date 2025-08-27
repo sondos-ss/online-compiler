@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Online Compiler</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f8f9fa;
+    }
+    #code {
+      font-family: monospace;
+      min-height: 200px;
+    }
+    pre {
+      background: #212529;
+      color: #f8f9fa;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">⚡ Online Compiler</h2>
+
+    <!-- Language Selection -->
+    <div class="mb-3">
+      <label for="language" class="form-label">Select Language</label>
+      <select class="form-select" id="language">
+        <option value="cpp">C++</option>
+        <option value="c">C</option>
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+      </select>
+    </div>
+
+    <!-- Code Editor -->
+    <div class="mb-3">
+      <label for="code" class="form-label">Write Code</label>
+      <textarea class="form-control" id="code" rows="10" placeholder="Write your code here..."></textarea>
+    </div>
+
+    <!-- Input Box -->
+    <div class="mb-3">
+      <label for="input" class="form-label">Input (optional)</label>
+      <textarea class="form-control" id="input" rows="3" placeholder="Program input..."></textarea>
+    </div>
+
+    <!-- Run Button -->
+    <div class="d-grid">
+      <button class="btn btn-primary" onclick="runCode()">▶ Run</button>
+    </div>
+
+    <!-- Output -->
+    <div class="mt-4">
+      <h5>Output:</h5>
+      <pre id="output">Your program output will appear here...</pre>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    async function runCode() {
+      const code = document.getElementById("code").value;
+      const language = document.getElementById("language").value;
+      const input = document.getElementById("input").value;
+
+      document.getElementById("output").innerText = "⏳ Running...";
+
+      try {
+        const res = await fetch("http://localhost:8000/compile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, language, input })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          document.getElementById("output").innerText = data.output || "No output";
+        } else {
+          document.getElementById("output").innerText = "⚠ Error: " + (data.error || "Something went wrong");
+        }
+      } catch (err) {
+        document.getElementById("output").innerText = "⚠ Network Error";
+      }
+    }
+  </script>
+</body>
+</html>

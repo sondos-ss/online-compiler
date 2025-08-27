@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Compiler</title>
+  <style>
+    :root {
+      --bg-light: #f5f5f5;
+      --text-light: #333;
+      --panel-light: #fff;
+
+      --bg-dark: #1e1e1e;
+      --text-dark: #f5f5f5;
+      --panel-dark: #2d2d2d;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      padding: 10px 20px;
+      background: #007acc;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .toggle-btn {
+      cursor: pointer;
+      border: none;
+      background: #fff;
+      color: #007acc;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .panel {
+      background: var(--panel-light);
+      border-radius: 6px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    textarea, select, input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-family: monospace;
+    }
+
+    textarea {
+      flex: 1;
+      resize: none;
+      min-height: 200px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      background: #007acc;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #005fa3;
+    }
+
+    /* Dark mode */
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    body.dark .panel {
+      background: var(--panel-dark);
+    }
+
+    body.dark textarea, 
+    body.dark select, 
+    body.dark input {
+      background: #1a1a1a;
+      color: var(--text-dark);
+      border: 1px solid #555;
+    }
+
+    body.dark button {
+      background: #444;
+      color: #f5f5f5;
+    }
+
+    body.dark button:hover {
+      background: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Online Compiler</h2>
+    <button class="toggle-btn" onclick="toggleMode()">🌙 Dark Mode</button>
+  </header>
+
+  <div class="container">
+    <!-- Left: Code + Input -->
+    <div class="panel">
+      <label for="language">Language:</label>
+      <select id="language">
+        <option value="cpp">C++</option>
+        <option value="c">C</option>
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+      </select>
+
+      <label for="code">Code:</label>
+      <textarea id="code" placeholder="Write your code here..."></textarea>
+
+      <label for="input">Input:</label>
+      <textarea id="input" placeholder="Enter program input here..."></textarea>
+
+      <button onclick="runCode()">▶ Run</button>
+    </div>
+
+    <!-- Right: Output -->
+    <div class="panel">
+      <h3>Output:</h3>
+      <textarea id="output" readonly></textarea>
+    </div>
+  </div>
+
+  <script>
+    async function runCode() {
+      const code = document.getElementById("code").value;
+      const language = document.getElementById("language").value;
+      const input = document.getElementById("input").value;
+
+      const response = await fetch("/compile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, language, input }),
+      });
+
+      const data = await response.json();
+      document.getElementById("output").value =
+        data.output || data.stdout || data.stderr || "Error: No output";
+    }
+
+    function toggleMode() {
+      document.body.classList.toggle("dark");
+      const btn = document.querySelector(".toggle-btn");
+      if (document.body.classList.contains("dark")) {
+        btn.textContent = "☀ Light Mode";
+      } else {
+        btn.textContent = "🌙 Dark Mode";
+      }
+    }
+  </script>
+</body>
+</html>
